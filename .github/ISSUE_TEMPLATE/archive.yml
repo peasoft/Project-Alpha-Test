@@ -1,0 +1,28 @@
+name: 提交存档请求
+description: 提交一个存档请求
+title: "[存档] <视频标题>"
+labels: ["request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 欢迎使用 BiliArchive！开始前请先仔细阅读首页说明！
+        # 请将标题补充完整！
+  - type: input
+    id: url
+    attributes:
+      label: 视频地址/BV号（不支持纯AV号）
+      placeholder: https://www.bilibili.com/video/BV**********
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: 特殊原因（可选）
+      description: |
+        如果您因为其它**合理的特殊原因**需要存档，请在下方说明，否则存档会被删除。
+        如果我们认为原因不合理，您的提交的视频会被删除！
+  - type: markdown
+    attributes:
+      value: |
+        提交前请再次确认数据的正确性。如果您滥用本服务，您将会遭到封禁！

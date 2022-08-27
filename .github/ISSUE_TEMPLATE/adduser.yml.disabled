@@ -1,0 +1,21 @@
+name: 提交用户存档请求
+description: 将一个用户加入自动存档列表
+title: "[用户] <用户名>"
+labels: ["user"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎使用 BiliArchive！开始前请先仔细阅读首页说明！
+        请将标题补充完整！
+  - type: input
+    id: url
+    attributes:
+      label: 用户主页地址/UID
+      placeholder: https://space.bilibili.com/**********
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        提交前请再次确认数据的正确性。如果您滥用本服务，您将会遭到封禁！
