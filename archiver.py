@@ -99,7 +99,7 @@ if __name__ == "__main__":
             issue = json.load(f)['issue']
         text = issue['body'].replace('\r','').replace('\n\n','\n').strip()
         url = text.split('\n')[1].strip()
-        proxy = random.choice(get_proxies())
+        proxy = get_proxies()[0]
         proxies = {
             'http': proxy,
             'https': proxy
