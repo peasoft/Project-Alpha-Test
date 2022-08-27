@@ -8,6 +8,7 @@ from contextlib import closing
 import os
 import shutil
 import sys
+import random
 
 
 header = {
@@ -34,6 +35,11 @@ def get_proxies():
     proxies = []
     for ip, port in zip(ips, ports):
         proxies.append(ip+':'+port)
+        try:
+            res = requests.get("https://www.bilibili.com/",headers=header,
+                            proxies={'http':proxies[-1],'https':proxies[-1]})
+        except requests.exceptions.ProxyError:
+            del proxies[-1]
 
     return proxies
 
@@ -93,7 +99,7 @@ if __name__ == "__main__":
             issue = json.load(f)['issue']
         text = issue['body'].replace('\r','').replace('\n\n','\n').strip()
         url = text.split('\n')[1].strip()
-        proxy = get_proxies()[0]
+        proxy = random.choice(get_proxies())
         proxies = {
             'http': proxy,
             'https': proxy
