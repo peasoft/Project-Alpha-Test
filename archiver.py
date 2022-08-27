@@ -38,9 +38,14 @@ def get_proxies():
         try:
             res = requests.get("https://www.bilibili.com/",headers=header,
                             proxies={'http':proxies[-1],'https':proxies[-1]})
-        except requests.exceptions.ProxyError:
+        except:
             del proxies[-1]
+        else:
+            if res.status_code != 200:
+                del proxies[-1]
 
+    if len(proxies) == 0:
+        raise Exception("no proxy")
     return proxies
 
 def download(vid):
