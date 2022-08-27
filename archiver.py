@@ -20,7 +20,6 @@ s = requests.session()
 def download(vid):
     video_name = vid['data']['title']
     print("\n"+video_name)
-    print(vid)
 
     video_path = os.path.join('%s_%d'%(vid['data']['owner']['name'],
             vid['data']['owner']['mid']),video_id+'_'+video_name)
@@ -37,11 +36,12 @@ def download(vid):
 
     for page in range(vid['data']['videos']):
         video = vid['data']['pages'][page]['cid']
+        print('https://api.bilibili.com/x/player/playurl?bvid='+video_id
+                +'&cid='+str(video)+'&qn=80&otype=json')
         video_info = json.loads(s.get(
                 'https://api.bilibili.com/x/player/playurl?bvid='+video_id
                 +'&cid='+str(video)+'&qn=80&otype=json',headers=header).text
         )
-        print(video_info)
         video_url = video_info['data']['durl'][0]['url']
         print("\nP%d 开始下载"%(page+1))
 
