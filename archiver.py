@@ -9,6 +9,7 @@ import os
 import shutil
 import sys
 import random
+import time
 
 
 header = {
@@ -36,13 +37,13 @@ def get_proxies():
     for ip, port in zip(ips, ports):
         proxies.append(ip+':'+port)
         try:
-            res = requests.get("https://www.bilibili.com/",headers=header,
-                            proxies={'http':proxies[-1],'https':proxies[-1]})
+            res = requests.get("https://www.bilibili.com/",headers=header,proxies={'http':proxies[-1],'https':proxies[-1]})
         except:
             del proxies[-1]
         else:
             if res.status_code != 200:
                 del proxies[-1]
+        time.sleep(1)
 
     if len(proxies) == 0:
         raise Exception("no proxy")
