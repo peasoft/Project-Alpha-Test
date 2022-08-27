@@ -2,7 +2,7 @@ name: 存档视频
 
 on:
   issues:
-    types: [open]
+    types: [opened]
     
 jobs:
   archive:
