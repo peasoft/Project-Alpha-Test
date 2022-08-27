@@ -36,6 +36,7 @@ def get_proxies():
     proxies = []
     for ip, port in zip(ips, ports):
         proxies.append(ip+':'+port)
+        print(proxies[-1],flush=True)
         try:
             res = requests.get("https://www.bilibili.com/",headers=header,proxies={'http':proxies[-1],'https':proxies[-1]})
         except:
