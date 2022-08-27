@@ -51,7 +51,7 @@ def get_proxies():
 
 def download(vid):
     video_name = vid['data']['title']
-    print("\n"+video_name)
+    print("\n"+video_name,flush=True)
 
     video_path = os.path.join('%s_%d'%(vid['data']['owner']['name'],
             vid['data']['owner']['mid']),video_id+'_'+video_name)
@@ -72,9 +72,9 @@ def download(vid):
                 'https://api.bilibili.com/x/player/playurl?bvid='+video_id
                 +'&cid='+str(video)+'&qn=80&otype=json',headers=header,proxies=proxies).text
         )
-        print(video_info)
+##        print(video_info)
         video_url = video_info['data']['durl'][0]['url']
-        print("\nP%d 开始下载"%(page+1))
+        print("\nP%d 开始下载"%(page+1),flush=True)
 
         with closing(s.get(video_url,headers=header,stream=True,proxies=proxies)) as response:
             chunk_size = 1024*16  # 单次请求最大值
@@ -88,13 +88,13 @@ def download(vid):
                     data_count = data_count + len(data)
                     now_jd = int((data_count / content_size) * 100)
                     if now_jd % 10 == 0 and now_jd != prev_jd:
-                        print("视频下载进度：%d%% (%d/%d)" % (now_jd, data_count, content_size))
+                        print("视频下载进度：%d%% (%d/%d)" % (now_jd, data_count, content_size),flush=True)
                         prev_jd = now_jd
 
-            print('\n下载成功！开始转换')
+            print('\n下载成功！开始转换',flush=True)
             os.system("ffmpeg -hide_banner -loglevel quiet -i "+flv_path+
                       " -c copy "+os.path.join(video_path,'P%d.mp4'%(page+1)))
-            print('转换完成，删除源文件')
+            print('转换完成，删除源文件',flush=True)
             os.remove(flv_path)
 
 
@@ -105,6 +105,7 @@ if __name__ == "__main__":
             issue = json.load(f)['issue']
         text = issue['body'].replace('\r','').replace('\n\n','\n').strip()
         url = text.split('\n')[1].strip()
+        print("寻找代理",flush=True)
         proxy = get_proxies()[0]
         proxies = {
             'http': proxy,
