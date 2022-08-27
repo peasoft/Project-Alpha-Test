@@ -36,8 +36,6 @@ def download(vid):
 
     for page in range(vid['data']['videos']):
         video = vid['data']['pages'][page]['cid']
-        print('https://api.bilibili.com/x/player/playurl?bvid='+video_id
-                +'&cid='+str(video)+'&qn=80&otype=json')
         video_info = json.loads(s.get(
                 'https://api.bilibili.com/x/player/playurl?bvid='+video_id
                 +'&cid='+str(video)+'&qn=80&otype=json',headers=header).text
