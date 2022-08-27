@@ -68,9 +68,8 @@ def download(vid):
 if __name__ == "__main__":
     with open(os.getenv("GITHUB_EVENT_PATH","event.json")) as f:
         issue = json.load(f)['issue']
-    text = issue['body'].replace('\r','').replace('\n\n','\n')
-    print(text)
-    url = text.split("视频地址/BV号（不支持纯AV号）")[1].split('\n')[0]
+    text = issue['body'].replace('\r','').replace('\n\n','\n').strip()
+    url = text.split('\n')[1].strip()
     print(url)
 ##    url = input("""\n请粘贴哔哩哔哩视频链接\n""")
     if 'https://b23.tv' in url:
