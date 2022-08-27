@@ -40,6 +40,7 @@ def download(vid):
                 'https://api.bilibili.com/x/player/playurl?bvid='+video_id
                 +'&cid='+str(video)+'&qn=80&otype=json',headers=header).text
         )
+        print(video_info)
         video_url = video_info['data']['durl'][0]['url']
         print("\nP%d 开始下载"%(page+1))
 
