@@ -20,6 +20,7 @@ s = requests.session()
 def download(vid):
     video_name = vid['data']['title']
     print("\n"+video_name)
+    print(vid)
 
     video_path = os.path.join('%s_%d'%(vid['data']['owner']['name'],
             vid['data']['owner']['mid']),video_id+'_'+video_name)
