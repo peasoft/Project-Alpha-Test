@@ -17,6 +17,26 @@ header = {
 s = requests.session()
 
 
+def get_proxies():
+    res = requests.get("https://free.kuaidaili.com/free/inha/")
+    text = res.text
+    text = text.split("<tbody>")[1].split("</tbody>")[0]
+
+    text = text.split('\n')
+    ips = []
+    ports = []
+    for l in text:
+        if "IP" in l:
+            ips.append(l.lstrip().lstrip('<td data-title="IP">').rstrip('</td>'))
+        elif "PORT" in l:
+            ports.append(l.lstrip().lstrip('<td data-title="PORT">').rstrip('</td>'))
+
+    proxies = []
+    for ip, port in zip(ips, ports):
+        proxies.append(ip+':'+port)
+
+    return proxies
+
 def download(vid):
     video_name = vid['data']['title']
     print("\n"+video_name)
@@ -38,12 +58,13 @@ def download(vid):
         video = vid['data']['pages'][page]['cid']
         video_info = json.loads(s.get(
                 'https://api.bilibili.com/x/player/playurl?bvid='+video_id
-                +'&cid='+str(video)+'&qn=80&otype=json',headers=header).text
+                +'&cid='+str(video)+'&qn=80&otype=json',headers=header,proxies=proxies).text
         )
+        print(video_info)
         video_url = video_info['data']['durl'][0]['url']
         print("\nP%d 开始下载"%(page+1))
 
-        with closing(s.get(video_url,headers=header,stream=True)) as response:
+        with closing(s.get(video_url,headers=header,stream=True,proxies=proxies)) as response:
             chunk_size = 1024*16  # 单次请求最大值
             content_size = int(response.headers['content-length'])  # 内容体总大小
             data_count = 0
@@ -66,24 +87,32 @@ def download(vid):
 
 
 if __name__ == "__main__":
-    with open(os.getenv("GITHUB_EVENT_PATH","event.json")) as f:
-        issue = json.load(f)['issue']
-    text = issue['body'].replace('\r','').replace('\n\n','\n').strip()
-    url = text.split('\n')[1].strip()
-    print(url)
-##    url = input("""\n请粘贴哔哩哔哩视频链接\n""")
+    event_file = os.getenv("GITHUB_EVENT_PATH")
+    if event_file:
+        with open(event_file) as f:
+            issue = json.load(f)['issue']
+        text = issue['body'].replace('\r','').replace('\n\n','\n').strip()
+        url = text.split('\n')[1].strip()
+        proxy = get_proxies()[0]
+        proxies = {
+            'http': proxy,
+            'https': proxy
+        }
+    else:
+        proxies = {}
+        url = input("""\n请粘贴哔哩哔哩视频链接\n""")
     if 'https://b23.tv' in url:
         loc = s.get(url,allow_redirects=False)
         url = loc.headers['location']
     if 'video/av' in url:
         av = json.loads(s.get(
                 'https://api.bilibili.com/x/web-interface/archive/stat?aid='
-                +url,headers=header).text)
+                +url,headers=header,proxies=proxies).text)
         url = av['data']['bvid']
 
     video_id = re.findall("[\w.]*[\w:\-\+\%]",url)[3]
     vid = json.loads(s.get(
             'https://api.bilibili.com/x/web-interface/view?bvid='+video_id,
-            headers=header).text)
+            headers=header,proxies=proxies).text)
 
     download(vid)
