@@ -19,36 +19,46 @@ header = {
 s = requests.session()
 
 
-def get_proxies():
-    res = requests.get("https://free.kuaidaili.com/free/inha/")
-    text = res.text
-    text = text.split("<tbody>")[1].split("</tbody>")[0]
-
-    text = text.split('\n')
+def get_proxy():
+    print("寻找代理",flush=True)
     ips = []
     ports = []
-    for l in text:
-        if "IP" in l:
-            ips.append(l.lstrip().lstrip('<td data-title="IP">').rstrip('</td>'))
-        elif "PORT" in l:
-            ports.append(l.lstrip().lstrip('<td data-title="PORT">').rstrip('</td>'))
+    speeds = []
 
-    proxies = []
-    for ip, port in zip(ips, ports):
-        proxies.append(ip+':'+port)
-        print(proxies[-1],flush=True)
-        try:
-            res = requests.get("https://www.bilibili.com/",headers=header,proxies={'http':proxies[-1],'https':proxies[-1]})
-        except:
-            del proxies[-1]
-        else:
-            if res.status_code != 200:
-                del proxies[-1]
+    for page in range(1,21):
+        print('第',page,'页',flush=True)
+        res = requests.get("https://free.kuaidaili.com/free/inha/%d/"%page)
+        if res.status_code != 200: break
+        text = res.text
+        text = text.split("<tbody>")[1].split("</tbody>")[0]
+
+        text = text.split('\n')
+        for l in text:
+            if "IP" in l:
+                ips.append(l.lstrip().lstrip('<td data-title="IP">').rstrip('</td>'))
+            elif "PORT" in l:
+                ports.append(l.lstrip().lstrip('<td data-title="PORT">').rstrip('</td>'))
+            elif "响应速度" in l:
+                speeds.append(eval(l.lstrip().lstrip('<td data-title="响应速度">').rstrip('秒</td>')))
         time.sleep(1)
 
-    if len(proxies) == 0:
-        raise Exception("no proxy")
-    return proxies
+    proxies = {}
+    for ip, port, speed in zip(ips, ports, speeds):
+        proxies[ip+':'+port] = speed
+    print("\n开始测试")
+    proxies = sorted(proxies.items(),key=lambda s:s[1])
+    for data in proxies:
+        proxy = data[0]
+        print(proxy,flush=True)
+        try:
+            res = requests.get("https://www.bilibili.com/",headers=header,proxies={'http':proxy,'https':proxy})
+        except Exception as e:
+            print(e.__class__.__name__,e)
+        else:
+            if res.status_code == 200:
+                return proxy
+##        time.sleep(0.2)
+    return None
 
 def download(vid):
     video_name = vid['data']['title']
@@ -106,8 +116,7 @@ if __name__ == "__main__":
             issue = json.load(f)['issue']
         text = issue['body'].replace('\r','').replace('\n\n','\n').strip()
         url = text.split('\n')[1].strip()
-        print("寻找代理",flush=True)
-        proxy = get_proxies()[0]
+        proxy = get_proxy()
         proxies = {
             'http': proxy,
             'https': proxy
